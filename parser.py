@@ -68,8 +68,10 @@ def transformDollar(money):
         return money
     return sub(r'[^\d.]', '', money)
 
-def toString(str):
-    return ""
+def toString(string):
+    quote = "\""
+    formatted = quote + string.replace(quote, quote+quote) + quote
+    return formatted
 
 """
 Parses a single json file. Currently, there's a loop that iterates over each
@@ -83,8 +85,10 @@ def parseJson(json_file):
         itemFile.truncate(0)
         userFile = open("users.dat", "a")
         userFile.truncate(0)
-        #bidFile = open("bids.dat", "a")
-        #bidFile.truncate(0)
+        categoryFile = open("categories.dat", "a")
+        categoryFile.truncate(0)
+        bidFile = open("bids.dat", "a")
+        bidFile.truncate(0)
         seperator = str("|")
         for item in items:
             """
@@ -95,25 +99,49 @@ def parseJson(json_file):
 
             buyPrice = "NULL"
             if "Buy_Price" in list(item.keys()):
-                buyPrice = item["Buy_Price"]
+                buyPrice = transformDollar(item["Buy_Price"])
 
-            #transform start & end time into right format
+            #transform start, end, current bid & first bid into right format
+            currently = transformDollar(item["Currently"])
             startTime = transformDttm(item["Started"])
             endTime = transformDttm(item["Ends"])
+            firstBid = transformDollar(item["First_Bid"])
 
             # add item information to items.dat
-            itemFile.write(item["ItemID"] + seperator + item["Name"] + seperator
-            +  item["Currently"] + seperator + buyPrice + seperator
-            + item["First_Bid"] + seperator + item["Number_of_Bids"] + seperator 
-            + startTime + seperator  + endTime + seperator + str(item["Description"]) + "\n")
+            itemFile.write(item["ItemID"] + seperator + toString(item["Name"]) + seperator
+            +  currently + seperator + buyPrice + seperator
+            + firstBid + seperator + item["Number_of_Bids"] + seperator 
+            + startTime + seperator  + endTime + seperator + toString(str(item["Description"])) + "\n")
             
+            #add categories & userIds to categories.dat
+            for category in item["Category"]:
+                categoryFile.write(item["ItemID"] + seperator + toString(category) + "\n")
             seller = item["Seller"]
+
             #add seller info to 'users'
-            userFile.write(seller["UserID"] + seperator + item["ItemID"] + seperator
-            + seller["Rating"] + seperator + item["Location"] + seperator + item["Country"] 
+            userFile.write(toString(seller["UserID"]) + seperator + item["ItemID"] + seperator
+            + seller["Rating"] + seperator + toString(item["Location"]) + seperator + toString(item["Country"] )
             + "\n")
 
             #iterate through 'bids'
+            if (item["Bids"] is not None):
+                for bid in item["Bids"]:
+                    bidInfo = bid["Bid"]
+                    bidder = bidInfo["Bidder"]
+                    amount = transformDollar(bidInfo["Amount"])
+                    time = transformDttm(bidInfo["Time"])
+                    location = "NULL"
+                    country = "NULL"
+                    #Check Location & Country for null values
+                    if "Location" in bidder.keys() :
+                        location = bidder["Location"]
+                    if "Country" in bidder.keys():
+                        country = bidder["Country"]
+                    bidFile.write(toString(bidder["UserID"]) + seperator + item["ItemID"] + seperator 
+                    + amount + seperator + time + "\n") 
+                    userFile.write(toString(bidder["UserID"]) + seperator + item["ItemID"] + seperator
+                    + bidder["Rating"] + seperator + toString(location) + seperator 
+                    + toString(country) + "\n") 
             
             pass
 
