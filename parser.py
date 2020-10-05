@@ -82,13 +82,9 @@ def parseJson(json_file):
     with open(json_file, 'r') as f:
         items = loads(f.read())['Items'] # creates a Python dictionary of Items for the supplied json file
         itemFile = open("items.dat", "a")
-        itemFile.truncate(0)
         userFile = open("users.dat", "a")
-        userFile.truncate(0)
         categoryFile = open("categories.dat", "a")
-        categoryFile.truncate(0)
         bidFile = open("bids.dat", "a")
-        bidFile.truncate(0)
         seperator = str("|")
         for item in items:
             """
@@ -107,16 +103,18 @@ def parseJson(json_file):
             endTime = transformDttm(item["Ends"])
             firstBid = transformDollar(item["First_Bid"])
 
+            seller = item["Seller"]
+
             # add item information to items.dat
             itemFile.write(item["ItemID"] + seperator + toString(item["Name"]) + seperator
             +  currently + seperator + buyPrice + seperator
             + firstBid + seperator + item["Number_of_Bids"] + seperator 
-            + startTime + seperator  + endTime + seperator + toString(str(item["Description"])) + "\n")
+            + startTime + seperator  + endTime + seperator + toString(str(item["Description"])) 
+            + seperator + seller["UserID"] + "\n")
             
             #add categories & userIds to categories.dat
             for category in item["Category"]:
                 categoryFile.write(item["ItemID"] + seperator + toString(category) + "\n")
-            seller = item["Seller"]
 
             #add seller info to 'users'
             userFile.write(toString(seller["UserID"]) + seperator + item["ItemID"] + seperator
