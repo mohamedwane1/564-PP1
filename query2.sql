@@ -1,0 +1,1 @@
+SELECT COUNT(DISTINCT UserID) FROM Users WHERE Users.Location = 'New York';

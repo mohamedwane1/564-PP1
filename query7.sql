@@ -1,0 +1,1 @@
+SELECT COUNT(DISTINCT C.Category) FROM Categories C, Bids B WHERE C.ItemID = B.ItemID AND B.Amount > 100;
