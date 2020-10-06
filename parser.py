@@ -104,13 +104,12 @@ def parseJson(json_file):
             firstBid = transformDollar(item["First_Bid"])
 
             seller = item["Seller"]
-            numCategories = len(item["Category"])
             # add item information to items.dat
             itemFile.write(item["ItemID"] + seperator + toString(item["Name"]) + seperator
             +  currently + seperator + buyPrice + seperator
             + firstBid + seperator + item["Number_of_Bids"] + seperator 
             + startTime + seperator  + endTime + seperator + toString(str(item["Description"])) 
-            + seperator + seller["UserID"] + seperator + str(numCategories) + "\n")
+            + seperator + seller["UserID"] + "\n")
             
             #add categories & userIds to categories.dat
             for category in item["Category"]:

@@ -15,7 +15,6 @@ CREATE TABLE Items
     Ends VARCHAR NOT NULL,
     Description VARCHAR NOT NULL,
     UserID VARCHAR NOT NULL,
-    Categories INT NOT NULL,
     PRIMARY KEY(ItemID),
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
